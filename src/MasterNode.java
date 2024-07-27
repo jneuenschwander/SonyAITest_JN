@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MasterNode {
-    private List<Integer> workerPorts;
+    private List<Integer> workerPorts; //this for the master node to keep track of all the workers
 
 
     public MasterNode(List<Integer> workersPorts) {
@@ -14,7 +14,7 @@ public class MasterNode {
     }
 
     public void sendPingToWorkers() {
-        for (Integer workerPort : workerPorts) {
+        for (Integer workerPort : workerPorts) { // this loop will send a signal to all port related to a worker.
             try (Socket socket = new Socket("localhost", workerPort);
                  ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
                  ObjectInputStream in = new ObjectInputStream(socket.getInputStream())) {
@@ -33,9 +33,9 @@ public class MasterNode {
     public void broadcastToWorkers() {
         List<Thread> threads = new ArrayList<>();
 
-        for (Integer workerPort : workerPorts) {
-            Thread thread = new Thread(() -> {
-                try (Socket socket = new Socket("localhost", workerPort);
+        for (Integer workerPort : workerPorts) { // this loop will send a signal to all port related to a worker.
+            Thread thread = new Thread(() -> { //this is block was made to ensure the broadcasting didn't follow a secuencial process
+                try (Socket socket = new Socket("localhost", workerPort); // every thread will send a message of broadcasting to a worker
                      ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
                      ObjectInputStream in = new ObjectInputStream(socket.getInputStream())) {
 
@@ -53,7 +53,7 @@ public class MasterNode {
             thread.start();
         }
 
-        // Wait for all threads to complete
+        // Wait for all threads to complete, Avoiding IOEException
         for (Thread thread : threads) {
             try {
                 thread.join();
@@ -64,12 +64,12 @@ public class MasterNode {
     }
 
     public void startRoundRobin() {
-        String message = "chain";
+        String message = "chain"; // this is the signal each worker will take for the round robin pattern.
         try (Socket socket = new Socket("localhost", workerPorts.get(0));
              ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
              ObjectInputStream in = new ObjectInputStream(socket.getInputStream())) {
 
-            out.writeObject(message);
+            out.writeObject(message); // this where the message is being sent.
             String response = (String) in.readObject();
             System.out.println("Received final message from workers: " + response);
         } catch (Exception e) {
@@ -82,7 +82,7 @@ public class MasterNode {
                  ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
                  ObjectInputStream in = new ObjectInputStream(socket.getInputStream())) {
 
-                out.writeObject("exit");
+                out.writeObject("exit"); //this is the signal to tell the worker to quit looping.
 
             } catch (Exception e) {
                 e.printStackTrace();
