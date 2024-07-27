@@ -9,42 +9,6 @@ import java.util.concurrent.TimeUnit;
 
 public class Main {
     public static void main(String[] args) {
-//        Scanner scanner = new Scanner(System.in);
-//        System.out.println("Enter the number of workers you would like to run: ");
-//        int workers = scanner.nextInt();
-//        scanner.close();
-
-
-
-
-        //** One to One messaging
-//        List<String> workers = new ArrayList<>();
-//        // Add worker addresses here (e.g., "localhost")
-//        workers.add("localhost");
-//        workers.add("localhost"); // Add more worker addresses as needed
-//
-//        MasterNode master = new MasterNode(workers);
-//        master.sendPingToWorkers();
-
-        //** Broadcast messaging
-//        List<String> workers = new ArrayList<>();
-//        // Add worker addresses here (e.g., "localhost")
-//        workers.add("localhost");
-//        workers.add("localhost"); // Add more worker addresses as needed
-//
-//        MasterNode master = new MasterNode(workers);
-//        master.broadcastToWorkers();
-
-        //**Round robin
-//        List<String> workers = new ArrayList<>();
-//        // Add worker addresses here (e.g., "localhost")
-//        workers.add("localhost");
-//        workers.add("localhost"); // Add more worker addresses as needed
-//
-//        MasterNode master = new MasterNode(workers);
-//        //master.startRoundRobin();
-
-
         Scanner scanner = new Scanner(System.in);
         System.out.println("Welcome to Sony AI test");
         System.out.println("Enter the number of workers you would like to run: ");
