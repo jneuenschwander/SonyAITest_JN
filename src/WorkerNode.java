@@ -10,10 +10,19 @@ import java.util.ArrayList;
 public class WorkerNode extends Thread {
     private String workerName;
     private Integer workerPort;
+    private List<Integer> workerPorts;
+    private int workerIndex;
+
 
     public WorkerNode(String workerName, Integer workerPort) {
         this.workerName = workerName;
         this.workerPort = workerPort;
+    }
+    public WorkerNode(String workerName, Integer workerPort, List<Integer> workerPorts, int workerIndex) {
+        this.workerName = workerName;
+        this.workerPort = workerPort;
+        this.workerPorts = workerPorts;
+        this.workerIndex = workerIndex;
     }
 
     @Override
@@ -38,7 +47,27 @@ public class WorkerNode extends Thread {
                         out.writeObject("received broadcast");
                         out.flush(); // Ensure data is sent
                     } else if (message.startsWith("chain")) {
-                        // Round robin logic to be implemented here
+                        message += " -> " + workerName;
+                        System.out.println(workerName + " updated chain message: " + message);
+
+                        if (workerIndex < workerPorts.size() - 1) {
+                            int nextWorkerPort = workerPorts.get(workerIndex + 1);
+                            try (Socket nextSocket = new Socket("localhost", nextWorkerPort);
+                                 ObjectOutputStream nextOut = new ObjectOutputStream(nextSocket.getOutputStream());
+                                 ObjectInputStream nextIn = new ObjectInputStream(nextSocket.getInputStream())) {
+
+                                nextOut.writeObject(message);
+                                nextOut.flush();
+
+                                String nextResponse = (String) nextIn.readObject();
+                                out.writeObject(nextResponse);
+                                out.flush();
+                            }
+                        } else {
+                            out.writeObject(message);
+                            out.flush();
+                        }
+
                     } else if ("exit".equals(message)) {
                         System.out.println(workerName + " exiting");
                         break;

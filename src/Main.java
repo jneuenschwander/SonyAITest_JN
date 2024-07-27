@@ -56,7 +56,7 @@ public class Main {
         for (int i = 0; i < amountWorkers; i++) {
             int port = 1025 + i;  // Assign unique port to each worker
             ports.add(port);
-            WorkerNode worker = new WorkerNode("Worker" + port, port);
+            WorkerNode worker = new WorkerNode("Worker" + ports.get(i), ports.get(i), ports, i);
             executor.submit(() -> worker.start());  // Submit worker to executor
         }
 
