@@ -7,19 +7,19 @@ import java.util.List;
 import java.util.ArrayList;
 
 
-public class WorkerNode {
+public class WorkerNode extends Thread {
     private String workerName;
     private Integer workerPort;
-
 
     public WorkerNode(String workerName, Integer workerPort) {
         this.workerName = workerName;
         this.workerPort = workerPort;
     }
 
-    public void start() {
+    @Override
+    public void run() {
         try (ServerSocket serverSocket = new ServerSocket(workerPort)) {
-            System.out.println(workerName + " is listening on port..." + workerPort);
+            System.out.println(workerName + " is listening on port " + workerPort);
 
             while (true) {
                 try (Socket socket = serverSocket.accept();
@@ -27,28 +27,20 @@ public class WorkerNode {
                      ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream())) {
 
                     String message = (String) in.readObject();
-                    if (message == "ping") {
-                        System.out.println("Received ping from master");
+                    System.out.println(workerName + " received message: " + message);
+
+                    if ("ping".equals(message)) {
+                        System.out.println(workerName + " received ping from master");
                         out.writeObject("pong");
-                    } else if (message == "broadcast") {
-                        System.out.println("Received broadcast from master");
+                        out.flush(); // Ensure data is sent
+                    } else if ("broadcast".equals(message)) {
+                        System.out.println(workerName + " received broadcast from master");
                         out.writeObject("received broadcast");
+                        out.flush(); // Ensure data is sent
                     } else if (message.startsWith("chain")) {
-//                        System.out.println(workerName + " received chain message: " + message);
-//                        message += " -> " + workerName;
-//                        if (workerIndex < workerPorts.size() - 1) {
-//                            try (Socket nextSocket = new Socket(workerPorts.get(workerIndex + 1), 12345);
-//                                 ObjectOutputStream nextOut = new ObjectOutputStream(nextSocket.getOutputStream());
-//                                 ObjectInputStream nextIn = new ObjectInputStream(nextSocket.getInputStream())) {
-//
-//                                nextOut.writeObject(message);
-//                                String nextResponse = (String) nextIn.readObject();
-//                                out.writeObject(nextResponse);
-//                            }
-//                        } else {
-//                            out.writeObject(message);
-//                        }
-                    } else if (message == "exit") {
+                        // Round robin logic to be implemented here
+                    } else if ("exit".equals(message)) {
+                        System.out.println(workerName + " exiting");
                         break;
                     }
                 } catch (Exception e) {
